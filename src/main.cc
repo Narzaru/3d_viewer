@@ -9,9 +9,9 @@
 #include <gtkmm-3.0/gtkmm/glarea.h>
 #include <memory>
 
-#include "engine/renderer/renderer.h"
-#include "engine/renderer/shader.h"
-#include "engine/object/object.h"
+#include "core/opengl/renderer/renderer.h"
+#include "core/opengl/renderer/shader.h"
+#include "object/object.h"
 #include "gl.h"
 
 class OpenGl : public Gtk::GLArea {
