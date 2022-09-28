@@ -1,8 +1,10 @@
 #include "shader.h"
-#include "gl.h"
+
 #include <fstream>
-#include <sstream>
 #include <glm/gtc/type_ptr.hpp>
+#include <sstream>
+
+#include "gl.h"
 
 ShaderProgram::ShaderProgram(const std::string &vertex_shader_path,
                              const std::string &fragment_shader_path)
@@ -14,7 +16,8 @@ ShaderProgram::ShaderProgram(const std::string &vertex_shader_path,
   std::string fragment_code = ReadFromFile(fragment_shader_path);
 
   vertex_shader_id_ = CompileShader(vertex_code.c_str(), GL_VERTEX_SHADER);
-  fragment_shader_id_ = CompileShader(fragment_code.c_str(), GL_FRAGMENT_SHADER);
+  fragment_shader_id_ =
+      CompileShader(fragment_code.c_str(), GL_FRAGMENT_SHADER);
 }
 
 ShaderProgram::ShaderProgram(const std::string &vertex_shader_path,
@@ -22,12 +25,11 @@ ShaderProgram::ShaderProgram(const std::string &vertex_shader_path,
                              const std::string &geometry_shader_path)
     : ShaderProgram(vertex_shader_path, fragment_shader_path) {
   std::string geometry_code = ReadFromFile(geometry_shader_path);
-  geometry_shader_id_ = CompileShader(geometry_code.c_str(), GL_GEOMETRY_SHADER);
+  geometry_shader_id_ =
+      CompileShader(geometry_code.c_str(), GL_GEOMETRY_SHADER);
 }
 
-ShaderProgram::~ShaderProgram() {
-  glDeleteProgram(program_id_);
-}
+ShaderProgram::~ShaderProgram() { glDeleteProgram(program_id_); }
 
 void ShaderProgram::Complete() {
   int is_success;
@@ -46,9 +48,7 @@ void ShaderProgram::Complete() {
   FreeCompiledShaders();
 }
 
-void ShaderProgram::Use() {
-  glUseProgram(program_id_);
-}
+void ShaderProgram::Use() { glUseProgram(program_id_); }
 
 std::string ShaderProgram::ReadFromFile(const std::string &path) {
   std::ifstream file_stream;

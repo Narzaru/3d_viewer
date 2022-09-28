@@ -5,4 +5,4 @@ class IShader {
   compile();
 };
 
-#endif //SRC_CORE_SHADER_PROGRAM_SHADER_H_
+#endif  // SRC_CORE_SHADER_PROGRAM_SHADER_H_

@@ -10,4 +10,4 @@ class Texture {
   std::string path;
 };
 
-#endif // SRC_ENGINE_RENDERER_TEXTURE_H_
+#endif  // SRC_ENGINE_RENDERER_TEXTURE_H_

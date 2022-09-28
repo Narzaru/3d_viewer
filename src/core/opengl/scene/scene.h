@@ -13,4 +13,4 @@ struct Scene {
   LightSource sources;
 };
 
-#endif // SRC_ENGINE_SCENE_SCENE_H_
+#endif  // SRC_ENGINE_SCENE_SCENE_H_

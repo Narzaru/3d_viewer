@@ -7,4 +7,4 @@ struct LightSource {
   // Put light implementation here
 };
 
-#endif // SRC_ENGINE_SCENE_GLOBAL_LIGHT_H_
+#endif  // SRC_ENGINE_SCENE_GLOBAL_LIGHT_H_

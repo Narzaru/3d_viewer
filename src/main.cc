@@ -1,18 +1,18 @@
 // Temporary and lazy includes. Like whole project.
 #include <gtkmm-3.0/gtkmm.h>
+#include <gtkmm-3.0/gtkmm/glarea.h>
 
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/fwd.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/trigonometric.hpp>
-#include <gtkmm-3.0/gtkmm/glarea.h>
 #include <memory>
 
 #include "core/opengl/renderer/renderer.h"
 #include "core/opengl/renderer/shader.h"
-#include "object/object.h"
 #include "gl.h"
+#include "object/object.h"
 
 class OpenGl : public Gtk::GLArea {
  public:
@@ -32,10 +32,11 @@ class OpenGl : public Gtk::GLArea {
                               "./shaders/depth_test_fragment.glsl");
     depth->Complete();
 
-    obj = new s21::Object(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f), "../models/cube.obj");
+    obj = new s21::Object(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f),
+                          "../models/cube.obj");
     axes.Axes();
     glClearColor(0.2, 0.2, 0.2, 1);
-//    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    //    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   }
 
   bool render(const Glib::RefPtr<Gdk::GLContext> &context) {
@@ -57,7 +58,7 @@ class OpenGl : public Gtk::GLArea {
     shader->UniformMatrix4fv("view", view);
     shader->UniformMatrix4fv("projection", projection);
     shader->UniformMatrix4fv("transform", transform);
-//    object.DrawMeshes(Renderer::VertexConnectionType::kTriangles);
+    //    object.DrawMeshes(Renderer::VertexConnectionType::kTriangles);
     obj->Draw();
 #ifdef AXES
     shader->Use();
@@ -83,17 +84,23 @@ class OpenGl : public Gtk::GLArea {
     } else if (key_val == 's' || key_val == 'S') {
       translate = glm::translate(translate, glm::vec3(0.0f, 0.0f, 0.1f));
     } else if (key_val == 'q' || key_val == 'Q') {
-      rotate = glm::rotate(rotate, glm::radians(15.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+      rotate =
+          glm::rotate(rotate, glm::radians(15.0f), glm::vec3(0.0f, 0.0f, 1.0f));
     } else if (key_val == 'e' || key_val == 'E') {
-      rotate = glm::rotate(rotate,glm::radians(-15.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+      rotate = glm::rotate(rotate, glm::radians(-15.0f),
+                           glm::vec3(0.0f, 0.0f, 1.0f));
     } else if (key_val == 'r' || key_val == 'R') {
-      rotate = glm::rotate(rotate, glm::radians(-15.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+      rotate = glm::rotate(rotate, glm::radians(-15.0f),
+                           glm::vec3(0.0f, 1.0f, 0.0f));
     } else if (key_val == 't' || key_val == 'T') {
-      rotate = glm::rotate(rotate, glm::radians(15.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+      rotate =
+          glm::rotate(rotate, glm::radians(15.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     } else if (key_val == 'f' || key_val == 'F') {
-      rotate = glm::rotate(rotate, glm::radians(-15.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+      rotate = glm::rotate(rotate, glm::radians(-15.0f),
+                           glm::vec3(1.0f, 0.0f, 0.0f));
     } else if (key_val == 'g' || key_val == 'G') {
-      rotate = glm::rotate(rotate, glm::radians(15.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+      rotate =
+          glm::rotate(rotate, glm::radians(15.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     } else if (key_val == 'z' || key_val == 'Z') {
       translate = glm::translate(translate, glm::vec3(0.0f, 0.1f, 0.0f));
     } else if (key_val == 'c' || key_val == 'C') {
@@ -138,8 +145,8 @@ int main(int argc, char *argv[]) {
   Gtk::Window window;
   OpenGl area;
   area.property_has_depth_buffer() = true;
-  window.signal_key_press_event()
-      .connect(sigc::mem_fun(area, &OpenGl::KeyHandler), false);
+  window.signal_key_press_event().connect(
+      sigc::mem_fun(area, &OpenGl::KeyHandler), false);
   window.add(area);
 
   window.show_all();

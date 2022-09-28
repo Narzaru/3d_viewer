@@ -11,10 +11,7 @@
 
 class Renderer {
  public:
-  enum class VertexConnectionType {
-    kTriangles,
-    kLines
-  };
+  enum class VertexConnectionType { kTriangles, kLines };
   Renderer() = default;
   explicit Renderer(const std::string &file_path);
   // Load vertices from a file
@@ -29,4 +26,4 @@ class Renderer {
   std::vector<Mesh> meshes_;
 };
 
-#endif // SRC_ENGINE_RENDERER_RENDERER_H_
+#endif  // SRC_ENGINE_RENDERER_RENDERER_H_

@@ -13,4 +13,4 @@ class Camera {
   glm::vec3 position;
 };
 
-#endif // SRC_ENGINE_SCENE_CAMERA_H_
+#endif  // SRC_ENGINE_SCENE_CAMERA_H_

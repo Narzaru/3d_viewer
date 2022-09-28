@@ -1,13 +1,14 @@
 #ifndef SRC_ENGINE_SHADER_H_
 #define SRC_ENGINE_SHADER_H_
 
-#include <glm/mat4x4.hpp>
 #include <cstdint>
+#include <glm/mat4x4.hpp>
 #include <string>
 #include <vector>
 
 class ShaderProgram {
   using uint = std::uint32_t;
+
  public:
   ShaderProgram() = delete;
   ShaderProgram(const std::string &vertex_shader_path,

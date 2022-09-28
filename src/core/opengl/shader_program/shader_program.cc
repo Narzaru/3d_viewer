@@ -1,6 +1,5 @@
 #include "shader_program.h"
 
 namespace s21 {
-namespace Shader {
-} // s21
-} // Shader
+namespace Shader {}  // namespace Shader
+}  // namespace s21

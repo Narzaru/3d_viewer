@@ -19,8 +19,7 @@ class Mesh {
   using string = std::string;
   using uint = std::uint32_t;
 
-  Mesh(vector<Vertex> vertices,
-       vector<uint> indices,
+  Mesh(vector<Vertex> vertices, vector<uint> indices,
        const map<string, Texture> &textures);
   Mesh(vector<Vertex> vertices, vector<uint> indices);
   ~Mesh();

@@ -12,4 +12,4 @@ struct Transform {
   glm::vec3 scale;
 };
 
-#endif // SRC_ENGINE_OBJECT_COMPONENTS_TRANSFORM_H_
+#endif  // SRC_ENGINE_OBJECT_COMPONENTS_TRANSFORM_H_
