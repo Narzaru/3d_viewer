@@ -1,59 +1,59 @@
 dependencies = $(shell find ../build/ -type f -name "*.d")
 -include ${dependencies}
 
-CXX ?= g++
+CXX = g++
 CXXFLAGS := ${CXXFLAGS} -std=c++17 -Wall -Wextra -g
 CXXFLAGS +=\
 	-I.\
-	-I./engine/exceptions\
-	-I./engine/renderer\
-	-I./engine/scene\
-	-I./shaders\
+	-I./core/exceptions\
+	-I./core/opengl/renderer\
+	-I./core/opengl/scene\
+	-I./opengl/shaders
 
 CXXFLAGS += $(shell pkg-config --cflags gtkmm-3.0 epoxy assimp)
-
 libs := $(shell pkg-config --libs gtkmm-3.0 epoxy assimp)
+
 header_only_files :=\
-	engine/exceptions/not_implemented.h\
-	engine/renderer/texture.h\
-	engine/renderer/vertex.h\
-	engine/scene/camera.h\
-	engine/scene/light_source.h\
-	engine/scene/scene.h
+	core/exceptions/not_implemented.h\
+	core/opengl/renderer/texture.h\
+	core/opengl/renderer/vertex.h\
+	core/opengl/scene/camera.h\
+	core/opengl/scene/light_source.h\
+	core/opengl/scene/scene.h
 
 
 all: viewer
 
-objects += ../build/mesh.o ${header_only_files}
-../build/mesh.o: ./engine/renderer/mesh.cc
+objects += ../build/mesh.o
+../build/mesh.o: core/opengl/renderer/mesh.cc ${header_only_files}
 	${CXX} ${CXXFLAGS} -c $< -o $@ -MD
 
-objects += ../build/renderer.o ${header_only_files}
-../build/renderer.o: ./engine/renderer/renderer.cc
+objects += ../build/renderer.o
+../build/renderer.o: core/opengl/renderer/renderer.cc ${header_only_files}
 	${CXX} ${CXXFLAGS} -c $< -o $@ -MD
 
-objects += ../build/shader.o ${header_only_files}
-../build/shader.o: ./engine/renderer/shader.cc
+objects += ../build/shader.o
+../build/shader.o: core/opengl/renderer/shader.cc ${header_only_files}
 	${CXX} ${CXXFLAGS} -c $< -o $@ -MD
 
-objects += ../build/main.o ${header_only_files}
-../build/main.o: ./main.cc
+objects += ../build/main.o
+../build/main.o: ./main.cc ${header_only_files}
 	${CXX} ${CXXFLAGS} -c $< -o $@ -MD
 
-objects += ../build/object.o ${header_only_files}
-../build/object.o: ./engine/object/object.cc
+objects += ../build/object.o
+../build/object.o: object/object.cc ${header_only_files}
 	${CXX} ${CXXFLAGS} -c $< -o $@ -MD
 
-objects += ../build/material.o ${header_only_files}
-../build/material.o: ./engine/object/components/material.cc
+objects += ../build/material.o
+../build/material.o: object/components/material.cc ${header_only_files}
 	${CXX} ${CXXFLAGS} -c $< -o $@ -MD
 
-objects += ../build/transform.o ${header_only_files}
-../build/transform.o: ./engine/object/components/transform.cc
+objects += ../build/transform.o
+../build/transform.o: object/components/transform.cc ${header_only_files}
 	${CXX} ${CXXFLAGS} -c $< -o $@ -MD
 
 viewer: ${objects}
-	${CXX} ${CXXFLAGS} -o $@ $^ $(libs)
+	${CXX} ${CXXFLAGS} $^ $(libs) -o $@
 
 clean:
 	rm -f ../build/*
