@@ -6,7 +6,6 @@
 #include <string>
 #include <vector>
 
-#include "shader.h"
 #include "texture.h"
 #include "vertex.h"
 

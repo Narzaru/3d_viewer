@@ -1,54 +1,43 @@
 #include "shader.h"
 
+#include <iostream>
 #include <fstream>
 #include <glm/gtc/type_ptr.hpp>
 #include <sstream>
 
+#include "file_not_found.h"
 #include "gl.h"
-
-ShaderProgram::ShaderProgram(const std::string &vertex_shader_path,
-                             const std::string &fragment_shader_path)
-    : program_id_(0),
-      vertex_shader_id_(0),
-      fragment_shader_id_(0),
-      geometry_shader_id_(0) {
-  std::string vertex_code = ReadFromFile(vertex_shader_path);
-  std::string fragment_code = ReadFromFile(fragment_shader_path);
-
-  vertex_shader_id_ = CompileShader(vertex_code.c_str(), GL_VERTEX_SHADER);
-  fragment_shader_id_ =
-      CompileShader(fragment_code.c_str(), GL_FRAGMENT_SHADER);
-}
 
 ShaderProgram::ShaderProgram(const std::string &vertex_shader_path,
                              const std::string &fragment_shader_path,
                              const std::string &geometry_shader_path)
-    : ShaderProgram(vertex_shader_path, fragment_shader_path) {
-  std::string geometry_code = ReadFromFile(geometry_shader_path);
-  geometry_shader_id_ =
-      CompileShader(geometry_code.c_str(), GL_GEOMETRY_SHADER);
+    : program_id_(0),
+      vertex_shader_(ReadFromFile(vertex_shader_path).c_str()),
+      fragment_shader_(ReadFromFile(fragment_shader_path).c_str()),
+      geometry_shader_("") {
+  if (vertex_shader_.IsCompiled() && fragment_shader_.IsCompiled()) {
+    int is_success;
+    char what[512];
+
+    program_id_ = glCreateProgram();
+    AttachShaders();
+    glLinkProgram(program_id_);
+    glGetProgramiv(program_id_, GL_LINK_STATUS, &is_success);
+    if (!is_success) {
+      glGetProgramInfoLog(program_id_, 512, nullptr, what);
+      std::cerr << "[ERROR] Compilation aborted with next message:\n";
+      std::cerr << what << std::endl;
+      // TODO error handling
+      // error text in what var
+      throw -1;
+    }
+    FreeCompiledShaders();
+  }
 }
 
 ShaderProgram::~ShaderProgram() { glDeleteProgram(program_id_); }
 
-void ShaderProgram::Complete() {
-  int is_success;
-  char what[512];
-
-  program_id_ = glCreateProgram();
-  AttachShaders();
-  glLinkProgram(program_id_);
-  glGetProgramiv(program_id_, GL_LINK_STATUS, &is_success);
-  if (!is_success) {
-    glGetProgramInfoLog(program_id_, 512, nullptr, what);
-    // TODO error handling
-    // error text in what var
-    throw -1;
-  }
-  FreeCompiledShaders();
-}
-
-void ShaderProgram::Use() { glUseProgram(program_id_); }
+void ShaderProgram::Use() const { glUseProgram(program_id_); }
 
 std::string ShaderProgram::ReadFromFile(const std::string &path) {
   std::ifstream file_stream;
@@ -62,55 +51,19 @@ std::string ShaderProgram::ReadFromFile(const std::string &path) {
     file_stream.close();
     return file_content;
   } else {
-    // TODO error handling
-    // cant open file
-    throw -1;
-  }
-}
-
-uint ShaderProgram::CompileShader(const char *code, uint type) {
-  uint shader_id = glCreateShader(type);
-  glShaderSource(shader_id, 1, &code, nullptr);
-  glCompileShader(shader_id);
-
-  int is_success;
-  char what[512];
-  glGetShaderiv(shader_id, GL_COMPILE_STATUS, &is_success);
-  if (!is_success) {
-    glGetShaderInfoLog(shader_id, 512, nullptr, what);
-    // TODO error handling
-    // error text in what var
-    throw -1;
-  } else {
-    return shader_id;
+    throw FileNotFound(path);
   }
 }
 
 void ShaderProgram::AttachShaders() {
-  if (vertex_shader_id_ != 0) {
-    glAttachShader(program_id_, vertex_shader_id_);
-  }
-  if (fragment_shader_id_ != 0) {
-    glAttachShader(program_id_, fragment_shader_id_);
-  }
-  if (geometry_shader_id_ != 0) {
-    glAttachShader(program_id_, geometry_shader_id_);
-  }
+  glAttachShader(program_id_, vertex_shader_.GetShaderID());
+  glAttachShader(program_id_, fragment_shader_.GetShaderID());
 }
 
 void ShaderProgram::FreeCompiledShaders() {
-  if (vertex_shader_id_ != 0) {
-    glDeleteShader(vertex_shader_id_);
-    vertex_shader_id_ = 0;
-  }
-  if (fragment_shader_id_ != 0) {
-    glDeleteShader(fragment_shader_id_);
-    fragment_shader_id_ = 0;
-  }
-  if (geometry_shader_id_ != 0) {
-    glDeleteShader(geometry_shader_id_);
-    geometry_shader_id_ = 0;
-  }
+  vertex_shader_.FreeShader();
+  fragment_shader_.FreeShader();
+  geometry_shader_.FreeShader();
 }
 
 int ShaderProgram::GetUniformPos(const std::string &name) {

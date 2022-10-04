@@ -5,12 +5,12 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/fwd.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include <glm/trigonometric.hpp>
 #include <memory>
 
 #include "core/opengl/renderer/renderer.h"
-#include "core/opengl/renderer/shader.h"
+#include "core/opengl/shader/shader_program.h"
+#include "core/opengl/shader/shader_program_builder.h"
 #include "gl.h"
 #include "object/object.h"
 
@@ -24,19 +24,22 @@ class OpenGl : public Gtk::GLArea {
   void init() {
     make_current();
 
-    shader = new ShaderProgram("./shaders/base_vertex.glsl",
-                               "./shaders/base_fragment.glsl");
-    shader->Complete();
+    s21::shaders::ShaderProgramBuilder builder;
+    shader =
+        std::move(builder.AddVertexShaderFromFile("./shaders/base_vertex.glsl")
+                      .AddFragmentShaderFromFile("./shaders/base_fragment.glsl")
+                      .Build());
 
-    depth = new ShaderProgram("./shaders/base_vertex.glsl",
-                              "./shaders/depth_test_fragment.glsl");
-    depth->Complete();
+    depth = std::move(
+        builder.AddVertexShaderFromFile("./shaders/base_vertex.glsl")
+            .AddFragmentShaderFromFile("./shaders/depth_test_fragment.glsl")
+            .Build());
 
     obj = new s21::Object(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f),
-                          "../models/cube.obj");
+                          "../models/bugatti.obj");
     axes.Axes();
     glClearColor(0.2, 0.2, 0.2, 1);
-    //    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    //    glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
   }
 
   bool render(const Glib::RefPtr<Gdk::GLContext> &context) {
@@ -54,11 +57,10 @@ class OpenGl : public Gtk::GLArea {
       projection = glm::ortho(-aspect, aspect, -1.f, 1.f, 0.1f, 10000.f);
     }
 
-    shader->Use();
-    shader->UniformMatrix4fv("view", view);
-    shader->UniformMatrix4fv("projection", projection);
-    shader->UniformMatrix4fv("transform", transform);
-    //    object.DrawMeshes(Renderer::VertexConnectionType::kTriangles);
+    shader.Use();
+    shader.UniformMatrix4fv("view", view);
+    shader.UniformMatrix4fv("projection", projection);
+    shader.UniformMatrix4fv("transform", transform);
     obj->Draw();
 #ifdef AXES
     shader->Use();
@@ -134,14 +136,14 @@ class OpenGl : public Gtk::GLArea {
   glm::mat4 view{1.f};
   glm::mat4 projection{1.f};
   glm::mat4 transform{1.f};
-  ShaderProgram *shader;
-  ShaderProgram *depth;
+  s21::shaders::ShaderProgram depth;
+  s21::shaders::ShaderProgram shader;
   s21::Object *obj;
   Renderer axes;
 };
 
 int main(int argc, char *argv[]) {
-  auto app = Gtk::Application::create(argc, argv, "org.gtkmm.example");
+  auto app = Gtk::Application::create(argc, argv);
   Gtk::Window window;
   OpenGl area;
   area.property_has_depth_buffer() = true;
