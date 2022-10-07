@@ -55,41 +55,48 @@ ShaderProgram::~ShaderProgram() {
   FreeProgram();
 }
 
-void ShaderProgram::AddVertexShader(VertexShader &&shader) {
+void ShaderProgram::SetVertexShader(VertexShader &&shader) {
   is_have_vertex_shader_ = true;
   vertex_shader_ = std::move(shader);
 }
 
-void ShaderProgram::AddFragmentShader(FragmentShader &&shader) {
+void ShaderProgram::SetFragmentShader(FragmentShader &&shader) {
   is_have_fragment_shader_ = true;
   fragment_shader_ = std::move(shader);
 }
 
-void ShaderProgram::AddGeometryShader(GeometryShader &&shader) {
+void ShaderProgram::SetGeometryShader(GeometryShader &&shader) {
   is_have_geometry_shader_ = true;
   geometry_shader_ = std::move(shader);
 }
 
 void ShaderProgram::Compile() {
   id_ = glCreateProgram();
-  if (AttachShaders()) {
-    glLinkProgram(id_);
-
-    int is_success;
-    char what[512];
-    glGetProgramiv(id_, GL_LINK_STATUS, &is_success);
-    if (!is_success) {
-      glGetProgramInfoLog(id_, 512, nullptr, what);
-      std::cerr << "[ERROR] Program compilation aborted with next message:\n";
-      std::cerr << what << std::endl;
-    }
-  } else {
+  if (!AttachShaders()) {
     std::cerr << "[ERROR] not enough base shaders" << std::endl;
+    FreeShaders();
+    FreeProgram();
+    return;
   }
+
+  glLinkProgram(id_);
+
+  int is_success;
+  char what[512];
+  glGetProgramiv(id_, GL_LINK_STATUS, &is_success);
+  if (!is_success) {
+    glGetProgramInfoLog(id_, 512, nullptr, what);
+    std::cerr << "[ERROR] Program compilation aborted with next message:\n";
+    std::cerr << what << std::endl;
+    FreeShaders();
+    FreeProgram();
+    return;
+  }
+
   FreeShaders();
 }
 
-bool ShaderProgram::IsCompiled() const { return !(id_ == 0); }
+bool ShaderProgram::IsCompiled() const { return id_ != 0; }
 
 bool ShaderProgram::AttachShaders() {
   if (is_have_vertex_shader_ && is_have_fragment_shader_) {
@@ -103,6 +110,7 @@ bool ShaderProgram::AttachShaders() {
     return false;
   }
 }
+
 void ShaderProgram::FreeShaders() {
   vertex_shader_.FreeShader();
   fragment_shader_.FreeShader();
@@ -115,16 +123,14 @@ void ShaderProgram::FreeProgram() {
     id_ = 0;
   }
 }
-void ShaderProgram::Use() {
-  glUseProgram(id_);
-}
+void ShaderProgram::Use() const { glUseProgram(id_); }
 
 int ShaderProgram::GetUniformPos(const std::string &name) const {
   return glGetUniformLocation(id_, name.c_str());
 }
 
 void ShaderProgram::UniformMatrix4fv(const std::string &name,
-                                     const glm::mat4 &matrix) {
+                                     const glm::mat4 &matrix) const {
   glUniformMatrix4fv(GetUniformPos(name), 1, GL_FALSE, glm::value_ptr(matrix));
 }
 

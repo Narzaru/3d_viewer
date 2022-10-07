@@ -2,7 +2,7 @@ dependencies = $(shell find ../build/ -type f -name "*.d")
 -include ${dependencies}
 
 CXX = g++
-CXXFLAGS := ${CXXFLAGS} -std=c++17 -Wall -Wextra -g
+CXXFLAGS := ${CXXFLAGS} -std=c++17 -Wall -Wextra -g -fPIC
 CXXFLAGS +=\
 	-I.\
 	-I./core/exceptions\
@@ -10,8 +10,9 @@ CXXFLAGS +=\
 	-I./core/opengl/scene\
 	-I./core/opengl/shader
 
-CXXFLAGS += $(shell pkg-config --cflags gtkmm-3.0 epoxy assimp)
-libs := $(shell pkg-config --libs gtkmm-3.0 epoxy assimp)
+req = gtkmm-3.0 epoxy assimp Qt5Core Qt5OpenGL Qt5Gui
+CXXFLAGS += $(shell pkg-config --cflags ${req})
+libs := $(shell pkg-config --libs ${req})
 
 header_only_files :=\
 	core/exceptions/not_implemented.h\
@@ -34,8 +35,8 @@ objects += ../build/renderer.o
 ../build/renderer.o: core/opengl/renderer/renderer.cc ${header_only_files}
 	${CXX} ${CXXFLAGS} -c $< -o $@ -MD
 
-objects += ../build/main.o
-../build/main.o: ./main.cc ${header_only_files}
+objects += ../build/qmain.o
+../build/qmain.o: ./qmain.cc ${header_only_files}
 	${CXX} ${CXXFLAGS} -c $< -o $@ -MD
 
 objects += ../build/object.o

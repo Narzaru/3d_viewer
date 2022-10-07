@@ -6,6 +6,7 @@
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/fwd.hpp>
 #include <glm/trigonometric.hpp>
+#include <iostream>
 #include <memory>
 
 #include "core/opengl/renderer/renderer.h"
@@ -25,15 +26,14 @@ class OpenGl : public Gtk::GLArea {
     make_current();
 
     s21::shaders::ShaderProgramBuilder builder;
-    shader =
-        std::move(builder.AddVertexShaderFromFile("./shaders/base_vertex.glsl")
-                      .AddFragmentShaderFromFile("./shaders/base_fragment.glsl")
-                      .Build());
 
-    depth = std::move(
-        builder.AddVertexShaderFromFile("./shaders/base_vertex.glsl")
-            .AddFragmentShaderFromFile("./shaders/depth_test_fragment.glsl")
-            .Build());
+    shader = builder.AddVertexShaderFromFile("./shaders/base_vertex.glsl")
+                 .AddFragmentShaderFromFile("./shaders/base_fragment.glsl")
+                 .Build();
+
+    depth = builder.AddVertexShaderFromFile("./shaders/base_vertex.glsl")
+                .AddFragmentShaderFromFile("./shaders/depth_test_fragment.glsl")
+                .Build();
 
     obj = new s21::Object(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f),
                           "../models/bugatti.obj");
@@ -52,7 +52,7 @@ class OpenGl : public Gtk::GLArea {
     float h = (float)get_allocation().get_height();
     float aspect = w / h;
     if (perspective) {
-      projection = glm::perspective(glm::radians(45.f), aspect, 0.1f, 10000.f);
+      projection = glm::perspective(glm::radians(90.f), aspect, 0.1f, 10000.f);
     } else {
       projection = glm::ortho(-aspect, aspect, -1.f, 1.f, 0.1f, 10000.f);
     }

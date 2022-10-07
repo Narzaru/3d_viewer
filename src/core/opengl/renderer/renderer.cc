@@ -130,7 +130,7 @@ Mesh Renderer::LoadMesh(const aiMesh *mesh) {
     vector.g = colors[1];
     vector.b = colors[2];
     vertex.color = glm::vec4(vector.r, vector.g, vector.b, 1.f);
-#else
+#elif COLORS
     if (mesh->mColors[0] != nullptr) {
       vector.r = mesh->mColors[0][i].r;
       vector.g = mesh->mColors[0][i].g;

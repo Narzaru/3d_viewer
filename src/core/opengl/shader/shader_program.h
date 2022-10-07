@@ -11,20 +11,21 @@ namespace s21::shaders {
 class ShaderProgram {
  public:
   ShaderProgram();
+  ShaderProgram(const ShaderProgram& other) = delete;
   ShaderProgram(s21::shaders::ShaderProgram &&other) noexcept;
   ShaderProgram &operator=(ShaderProgram &&other) noexcept;
   ~ShaderProgram();
 
-  void AddVertexShader(VertexShader &&shader);
-  void AddFragmentShader(FragmentShader &&shader);
-  void AddGeometryShader(GeometryShader &&shader);
+  void SetVertexShader(VertexShader &&shader);
+  void SetFragmentShader(FragmentShader &&shader);
+  void SetGeometryShader(GeometryShader &&shader);
   void Compile();
   [[nodiscard]] bool IsCompiled() const;
-  void Use();
+  void Use() const;
 
   [[nodiscard]] int GetUniformPos(const std::string &name) const;
 
-  void UniformMatrix4fv(const std::string &name, const glm::mat4 &matrix);
+  void UniformMatrix4fv(const std::string &name, const glm::mat4 &matrix) const;
 
  private:
   bool AttachShaders();
