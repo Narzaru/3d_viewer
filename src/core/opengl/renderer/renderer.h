@@ -11,7 +11,7 @@
 
 class Renderer {
  public:
-  enum class VertexConnectionType { kTriangles, kLines };
+  enum class VertexConnectionType { kTriangles, kLines, kNone };
   Renderer() = default;
   explicit Renderer(const std::string &file_path);
   // Load vertices from a file

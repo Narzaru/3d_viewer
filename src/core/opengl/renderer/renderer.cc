@@ -10,9 +10,7 @@
 #include "texture.h"
 #include "vertex.h"
 
-Renderer::Renderer(const std::string &file_path) {
-  LoadFromFile(file_path);
-}
+Renderer::Renderer(const std::string &file_path) { LoadFromFile(file_path); }
 
 void Renderer::LoadFromFile(const std::string &file_path) {
   Assimp::Importer importer;
@@ -35,25 +33,14 @@ void Renderer::LoadFromFile(const std::string &file_path) {
 }
 
 void Renderer::Axes() {
-  std::array<glm::vec3, 6> vs = {
-      glm::vec3(0.0),
-      glm::vec3(1.0, 0.0, 0.0),
-      glm::vec3(0.0),
-      glm::vec3(0.0, 1.0, 0.0),
-      glm::vec3(0.0),
-      glm::vec3(0.0, 0.0, 1.0)
-  };
+  std::array<glm::vec3, 6> vs = {glm::vec3(0.0), glm::vec3(1.0, 0.0, 0.0),
+                                 glm::vec3(0.0), glm::vec3(0.0, 1.0, 0.0),
+                                 glm::vec3(0.0), glm::vec3(0.0, 0.0, 1.0)};
   std::array<glm::vec4, 6> colors = {
-      glm::vec4(1.0, 0.0, 0.0, 1.0),
-      glm::vec4(1.0, 0.0, 0.0, 1.0),
-      glm::vec4(0.0, 1.0, 0.0, 1.0),
-      glm::vec4(0.0, 1.0, 0.0, 1.0),
-      glm::vec4(0.0, 0.0, 1.0, 1.0),
-      glm::vec4(0.0, 0.0, 1.0, 1.0)
-  };
-  std::vector<std::uint32_t> indices = {
-      0, 1, 2, 3, 4, 5
-  };
+      glm::vec4(1.0, 0.0, 0.0, 1.0), glm::vec4(1.0, 0.0, 0.0, 1.0),
+      glm::vec4(0.0, 1.0, 0.0, 1.0), glm::vec4(0.0, 1.0, 0.0, 1.0),
+      glm::vec4(0.0, 0.0, 1.0, 1.0), glm::vec4(0.0, 0.0, 1.0, 1.0)};
+  std::vector<std::uint32_t> indices = {0, 1, 2, 3, 4, 5};
   Vertex vertex;
   std::vector<Vertex> vertices;
   for (int i = 0; i < 6; ++i) {
@@ -68,10 +55,13 @@ void Renderer::DrawMeshes(VertexConnectionType type) {
   for (const Mesh &item : meshes_) {
     if (type == VertexConnectionType::kTriangles)
       item.DrawTriangles();
-    else
+    else if (type == VertexConnectionType::kLines)
       item.DrawLines();
+    else
+      item.DrawPoints();
   }
 }
+
 void Renderer::ProcessNode(const aiNode *node, const aiScene *scene) {
   for (uint32_t i = 0; i < node->mNumChildren; ++i) {
     ProcessNode(node->mChildren[i], scene);
@@ -81,6 +71,7 @@ void Renderer::ProcessNode(const aiNode *node, const aiScene *scene) {
     meshes_.push_back(LoadMesh(scene->mMeshes[node->mMeshes[i]]));
   }
 }
+
 Mesh Renderer::LoadMesh(const aiMesh *mesh) {
   std::vector<Vertex> vertices;
   std::vector<std::uint32_t> indices;
