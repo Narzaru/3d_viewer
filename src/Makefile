@@ -10,7 +10,7 @@ CXXFLAGS +=\
 	-I./core/opengl/scene\
 	-I./core/opengl/shader
 
-req = gtkmm-3.0 epoxy assimp Qt5Core Qt5OpenGL Qt5Gui
+req = gtkmm-3.0 epoxy assimp #Qt5Core Qt5OpenGL Qt5Gui
 CXXFLAGS += $(shell pkg-config --cflags ${req})
 libs := $(shell pkg-config --libs ${req})
 
@@ -28,7 +28,7 @@ header_only_files :=\
 all: viewer
 
 objects += ../build/mesh.o
-../build/mesh.o: core/opengl/renderer/mesh.cc ${header_only_files}
+../build/mesh.o: core/opengl/mesh/mesh.cc ${header_only_files}
 	${CXX} ${CXXFLAGS} -c $< -o $@ -MD
 
 objects += ../build/renderer.o
@@ -61,6 +61,10 @@ objects += ../build/shader_program.o
 
 objects += ../build/shader_program_builder.o
 ../build/shader_program_builder.o: core/opengl/shader/shader_program_builder.cc ${header_only_files}
+	${CXX} ${CXXFLAGS} -c $< -o $@ -MD
+
+objects += ../build/mesh_loader.o
+../build/mesh_loader.o: core/opengl/mesh/mesh_loader.cc ${header_only_files}
 	${CXX} ${CXXFLAGS} -c $< -o $@ -MD
 
 viewer: ${objects}
