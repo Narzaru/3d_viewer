@@ -2,7 +2,7 @@ dependencies = $(shell find ../build/ -type f -name "*.d")
 -include ${dependencies}
 
 CXX = g++
-CXXFLAGS := ${CXXFLAGS} -std=c++17 -Wall -Wextra -g -fPIC
+CXXFLAGS := ${CXXFLAGS} -std=c++17 -Wall -Wextra -g -fPIC -D COLORS
 CXXFLAGS +=\
 	-I.\
 	-I./core/exceptions\
@@ -35,8 +35,8 @@ objects += ../build/renderer.o
 ../build/renderer.o: core/opengl/renderer/renderer.cc ${header_only_files}
 	${CXX} ${CXXFLAGS} -c $< -o $@ -MD
 
-objects += ../build/qmain.o
-../build/qmain.o: ./qmain.cc ${header_only_files}
+objects += ../build/main.o
+../build/main.o: ./main.cc ${header_only_files}
 	${CXX} ${CXXFLAGS} -c $< -o $@ -MD
 
 objects += ../build/object.o
