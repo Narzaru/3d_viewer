@@ -129,9 +129,19 @@ int ShaderProgram::GetUniformPos(const std::string &name) const {
   return glGetUniformLocation(id_, name.c_str());
 }
 
-void ShaderProgram::UniformMatrix4fv(const std::string &name,
+void ShaderProgram::SetUniformMatrix4f(const std::string &name,
                                      const glm::mat4 &matrix) const {
   glUniformMatrix4fv(GetUniformPos(name), 1, GL_FALSE, glm::value_ptr(matrix));
+}
+
+void ShaderProgram::SetUniformVector2f(const std::string &name,
+                                    const glm::vec2 &matrix) const {
+  glUniform2fv(GetUniformPos(name), 1, glm::value_ptr(matrix));
+}
+
+void ShaderProgram::SetUniformInteger(const std::string &name,
+                                      std::int32_t value) const {
+  glUniform1i(GetUniformPos(name), value);
 }
 
 }  // namespace s21::shaders
