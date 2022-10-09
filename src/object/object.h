@@ -22,8 +22,8 @@ class Object {
     transform_.set(position, rotation, scale);
   }
 
-  void Draw() {
-    renderer_.DrawMeshes(Renderer::VertexConnectionType::kTriangles);
+  void Draw(Renderer::VertexConnectionType type = Renderer::VertexConnectionType::kTriangles) {
+    renderer_.DrawMeshes(type);
   }
 
  private:

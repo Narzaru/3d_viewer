@@ -13,8 +13,10 @@ class Mesh {
  public:
   template <typename T>
   using vector = std::vector<T>;
+
   template <typename Key, typename Val>
   using map = std::map<Key, Val>;
+
   using string = std::string;
   using uint = std::uint32_t;
 
@@ -24,8 +26,11 @@ class Mesh {
   ~Mesh();
   Mesh(const Mesh &other) = delete;
   Mesh(Mesh &&other) noexcept;
+
   void DrawTriangles() const;
   void DrawLines() const;
+  void DrawPoints() const;
+
   void SetupMesh();
 
  private:

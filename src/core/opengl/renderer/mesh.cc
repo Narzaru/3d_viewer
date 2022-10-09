@@ -40,6 +40,12 @@ void Mesh::DrawLines() const {
   glBindVertexArray(0);
 }
 
+void Mesh::DrawPoints() const {
+  glBindVertexArray(VAO);
+  glDrawElements(GL_POINT, indices.size(), GL_UNSIGNED_INT, 0);
+  glBindVertexArray(0);
+}
+
 void Mesh::SetupMesh() {
   glGenVertexArrays(1, &VAO);
   glGenBuffers(1, &VBO);
@@ -83,6 +89,7 @@ void Mesh::SetupMesh() {
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
+
 Mesh::~Mesh() {
   glDeleteVertexArrays(1, &VAO);
   glDeleteBuffers(1, &VBO);

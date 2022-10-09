@@ -5,9 +5,11 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/fwd.hpp>
+#include <glm/mat2x2.hpp>
 #include <glm/trigonometric.hpp>
 #include <iostream>
 #include <memory>
+#include <ctime>
 
 #include "core/opengl/renderer/renderer.h"
 #include "core/opengl/shader/shader_program.h"
@@ -32,17 +34,20 @@ class OpenGl : public Gtk::GLArea {
                  .Build();
 
     depth = builder.AddVertexShaderFromFile("./shaders/base_vertex.glsl")
-                .AddFragmentShaderFromFile("./shaders/depth_test_fragment.glsl")
+                .AddFragmentShaderFromFile("./shaders/base_fragment.glsl")
+                .AddGeometryShaderFromFile("./shaders/geometry_shader.glsl")
                 .Build();
 
     obj = new s21::Object(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f),
                           "../models/bugatti.obj");
-    axes.Axes();
+    int i = 0;
     glClearColor(0.2, 0.2, 0.2, 1);
-    //    glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_PROGRAM_POINT_SIZE);
   }
 
   bool render(const Glib::RefPtr<Gdk::GLContext> &context) {
+    start_time = clock();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     projection = glm::mat4(1.f);
@@ -57,20 +62,25 @@ class OpenGl : public Gtk::GLArea {
       projection = glm::ortho(-aspect, aspect, -1.f, 1.f, 0.1f, 10000.f);
     }
 
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     shader.Use();
-    shader.UniformMatrix4fv("view", view);
-    shader.UniformMatrix4fv("projection", projection);
-    shader.UniformMatrix4fv("transform", transform);
+    shader.SetUniformMatrix4f("view", view);
+    shader.SetUniformMatrix4f("projection", projection);
+    shader.SetUniformMatrix4f("transform", transform);
     obj->Draw();
-#ifdef AXES
-    shader->Use();
-    shader->UniformMatrix4fv("view", view);
-    shader->UniformMatrix4fv("projection", projection);
-    shader->UniformMatrix4fv("transform", transform);
-    glDisable(GL_DEPTH_TEST);
-    axes.DrawMeshes(Renderer::VertexConnectionType::kLines);
-    glEnable(GL_DEPTH_TEST);
-#endif  // AXES
+
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    depth.Use();
+    depth.SetUniformMatrix4f("view", view);
+    depth.SetUniformMatrix4f("projection", projection);
+    depth.SetUniformMatrix4f("transform", transform);
+    depth.SetUniformVector2f("ScreenSize", glm::vec2(w, h));
+    depth.SetUniformInteger("DrawType", 1);
+    obj->Draw();
+    end_time = clock();
+    std::cerr << static_cast<double>(end_time - start_time) / CLOCKS_PER_SEC * 1000.0 << " ms ";
+    std::cerr << "FPS " << 1 * CLOCKS_PER_SEC / static_cast<double>(end_time - start_time) << std::endl;
+
     queue_draw();
     return true;
   }
@@ -123,7 +133,6 @@ class OpenGl : public Gtk::GLArea {
     }
 
     transform = translate * scale * rotate;
-
     return false;
   }
 
@@ -139,7 +148,8 @@ class OpenGl : public Gtk::GLArea {
   s21::shaders::ShaderProgram depth;
   s21::shaders::ShaderProgram shader;
   s21::Object *obj;
-  Renderer axes;
+  clock_t start_time;
+  clock_t end_time;
 };
 
 int main(int argc, char *argv[]) {
