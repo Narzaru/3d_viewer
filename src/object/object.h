@@ -23,7 +23,7 @@ class Object {
   }
 
   void Draw(Renderer::VertexConnectionType type = Renderer::VertexConnectionType::kTriangles) {
-    renderer_.DrawMeshes(type);
+    renderer_.Draw(type);
   }
 
  private:

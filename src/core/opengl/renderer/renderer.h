@@ -6,24 +6,27 @@
 #include <map>
 #include <string>
 
-#include "mesh.h"
+#include "core/opengl/mesh/mesh.h"
+#include "core/opengl/mesh/mesh_loader.h"
+#include "core/opengl/shader/shader_program.h"
+#include "core/opengl/shader/shader_program_builder.h"
 #include "texture.h"
 
+// The renderer class responsible for displaying the model in a world
 class Renderer {
  public:
   enum class VertexConnectionType { kTriangles, kLines, kNone };
+
   Renderer() = default;
   explicit Renderer(const std::string &file_path);
-  // Load vertices from a file
-  void LoadFromFile(const std::string &file_path);
-  void Axes();
-  // If you have a gl context, draw meshes
-  void DrawMeshes(VertexConnectionType type);
+  void LoadMeshesFromFile(const std::string &file_path);
+  void AttachShaderProgram(s21::shaders::ShaderProgram &&shader_program);
+  void Draw(VertexConnectionType type = VertexConnectionType::kTriangles);
 
  private:
-  void ProcessNode(const aiNode *node, const aiScene *scene);
-  Mesh LoadMesh(const aiMesh *mesh);
+  MeshLoader mesh_loader_;
   std::vector<Mesh> meshes_;
+  s21::shaders::ShaderProgram shader_program_;
 };
 
 #endif  // SRC_ENGINE_RENDERER_RENDERER_H_

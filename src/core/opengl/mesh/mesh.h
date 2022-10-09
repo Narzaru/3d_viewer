@@ -1,13 +1,13 @@
-#ifndef SRC_ENGINE_RENDERER_MESH_H_
-#define SRC_ENGINE_RENDERER_MESH_H_
+#ifndef CORE_OPENGL_MESH_MESH__H_
+#define CORE_OPENGL_MESH_MESH__H_
 
 #include <cstdint>
 #include <map>
 #include <string>
 #include <vector>
 
-#include "texture.h"
-#include "vertex.h"
+#include "core/opengl/renderer/texture.h"
+#include "core/opengl/renderer/vertex.h"
 
 class Mesh {
  public:
@@ -30,17 +30,18 @@ class Mesh {
   void DrawTriangles() const;
   void DrawLines() const;
   void DrawPoints() const;
-
   void SetupMesh();
 
  private:
   // Properties
+  uint number_of_vertices{0};
+  uint number_of_faces{0};
   vector<Vertex> vertices;
   vector<uint> indices;
   static map<std::string, Texture> texture_pool_;
   uint VAO;  // Vertex Arrays Objects
   uint VBO;  // Vertex Buffer Objects
-  uint EBO;  // Element Buffer Objects (vertex indices)
+  uint EBO;  // Element Buffer Objects (Indices Buffer Object)
 };
 
-#endif  // SRC_ENGINE_RENDERER_MESH_H_
+#endif
