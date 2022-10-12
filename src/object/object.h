@@ -10,25 +10,21 @@
 namespace s21 {
 class Object {
  public:
-  Object() = default;
-  Object(glm::vec3 instance_position, glm::vec3 instance_rotation,
-         glm::vec3 instance_scale, const std::string &model_path)
-      : transform_(instance_position, instance_rotation, instance_scale),
-        renderer_(model_path) {}
-
-  [[nodiscard]] const Transform &GetTransform() const { return transform_; }
-
-  void SetTransform(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale) {
-    transform_.set(position, rotation, scale);
-  }
-
-  void Draw(Renderer::VertexConnectionType type = Renderer::VertexConnectionType::kTriangles) {
-    renderer_.Draw(type);
-  }
+  Object();
+  void LoadMeshesFromFile(const std::string &path);
+  [[nodiscard]] components::Transform &Transform();
+  void Draw() const;
+  static void link_view_matrix(glm::mat4 *view_matrix);
+  static void link_projection_matrix(glm::mat4 *projection_matrix);
+  glm::mat4 GetResultMatrix();
 
  private:
-  Transform transform_;
-  Renderer renderer_;
+  s21::MeshLoader mesh_loader_;
+  components::Transform transform_;
+  s21::renderer::Renderer renderer_;
+
+  static glm::mat4 *view_matrix_;
+  static glm::mat4 *projection_matrix_;
 };
 }  // namespace s21
 

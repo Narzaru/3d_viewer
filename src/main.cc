@@ -2,16 +2,14 @@
 #include <gtkmm-3.0/gtkmm.h>
 #include <gtkmm-3.0/gtkmm/glarea.h>
 
+#include <ctime>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/fwd.hpp>
-#include <glm/mat2x2.hpp>
 #include <glm/trigonometric.hpp>
 #include <iostream>
 #include <memory>
-#include <ctime>
 
-#include "core/opengl/renderer/renderer.h"
 #include "core/opengl/shader/shader_program.h"
 #include "core/opengl/shader/shader_program_builder.h"
 #include "gl.h"
@@ -29,25 +27,24 @@ class OpenGl : public Gtk::GLArea {
 
     s21::shaders::ShaderProgramBuilder builder;
 
-    shader = builder.AddVertexShaderFromFile("./shaders/base_vertex.glsl")
+    base = builder.AddVertexShaderFromFile("./shaders/base_vertex.glsl")
                  .AddFragmentShaderFromFile("./shaders/base_fragment.glsl")
                  .Build();
 
-    depth = builder.AddVertexShaderFromFile("./shaders/base_vertex.glsl")
+    vertex = builder.AddVertexShaderFromFile("./shaders/base_vertex.glsl")
                 .AddFragmentShaderFromFile("./shaders/base_fragment.glsl")
                 .AddGeometryShaderFromFile("./shaders/geometry_shader.glsl")
                 .Build();
 
-    obj = new s21::Object(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f),
-                          "../models/bugatti.obj");
-    int i = 0;
+    obj = new s21::Object();
+    obj->LoadMeshesFromFile("../models/bugatti.obj");
+
     glClearColor(0.2, 0.2, 0.2, 1);
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_PROGRAM_POINT_SIZE);
   }
 
   bool render(const Glib::RefPtr<Gdk::GLContext> &context) {
-    start_time = clock();
+    std::cerr << "Draw" << std::endl;
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     projection = glm::mat4(1.f);
@@ -62,67 +59,58 @@ class OpenGl : public Gtk::GLArea {
       projection = glm::ortho(-aspect, aspect, -1.f, 1.f, 0.1f, 10000.f);
     }
 
+    glm::mat4 test = obj->GetResultMatrix();
+
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    shader.Use();
-    shader.SetUniformMatrix4f("view", view);
-    shader.SetUniformMatrix4f("projection", projection);
-    shader.SetUniformMatrix4f("transform", transform);
+    base.Use();
+    base.SetUniformMatrix4f("view", view);
+    base.SetUniformMatrix4f("projection", projection);
+    base.SetUniformMatrix4f("transform", obj->GetResultMatrix());
     obj->Draw();
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    depth.Use();
-    depth.SetUniformMatrix4f("view", view);
-    depth.SetUniformMatrix4f("projection", projection);
-    depth.SetUniformMatrix4f("transform", transform);
-    depth.SetUniformVector2f("ScreenSize", glm::vec2(w, h));
-    depth.SetUniformInteger("DrawType", 1);
+    vertex.Use();
+    vertex.SetUniformMatrix4f("view", view);
+    vertex.SetUniformMatrix4f("projection", projection);
+    vertex.SetUniformMatrix4f("transform", obj->GetResultMatrix());
+    vertex.SetUniformVector2f("ScreenSize", glm::vec2(w, h));
+    vertex.SetUniformInteger("DrawType", 1);
     obj->Draw();
-    end_time = clock();
-    std::cerr << static_cast<double>(end_time - start_time) / CLOCKS_PER_SEC * 1000.0 << " ms ";
-    std::cerr << "FPS " << 1 * CLOCKS_PER_SEC / static_cast<double>(end_time - start_time) << std::endl;
-
-    queue_draw();
     return true;
   }
 
   bool KeyHandler(GdkEventKey *event) {
     uint key_val = event->keyval;
     if (key_val == 'a' || key_val == 'A') {
-      translate = glm::translate(translate, glm::vec3(-0.1f, 0.0f, 0.0f));
+      obj->Transform().position.x -= 0.1f;
     } else if (key_val == 'd' || key_val == 'D') {
-      translate = glm::translate(translate, glm::vec3(0.1f, 0.0f, 0.0f));
+      obj->Transform().position.x += 0.1f;
     } else if (key_val == 'w' || key_val == 'W') {
-      translate = glm::translate(translate, glm::vec3(0.0f, 0.0f, -0.1f));
+      obj->Transform().position.z -= 0.1f;
     } else if (key_val == 's' || key_val == 'S') {
-      translate = glm::translate(translate, glm::vec3(0.0f, 0.0f, 0.1f));
+      obj->Transform().position.z += 0.1f;
     } else if (key_val == 'q' || key_val == 'Q') {
-      rotate =
-          glm::rotate(rotate, glm::radians(15.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+      obj->Transform().rotation.z += 15.0f;
     } else if (key_val == 'e' || key_val == 'E') {
-      rotate = glm::rotate(rotate, glm::radians(-15.0f),
-                           glm::vec3(0.0f, 0.0f, 1.0f));
+      obj->Transform().rotation.z -= 15.1f;
     } else if (key_val == 'r' || key_val == 'R') {
-      rotate = glm::rotate(rotate, glm::radians(-15.0f),
-                           glm::vec3(0.0f, 1.0f, 0.0f));
+      obj->Transform().rotation.y -= 15.0f;
     } else if (key_val == 't' || key_val == 'T') {
-      rotate =
-          glm::rotate(rotate, glm::radians(15.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+      obj->Transform().rotation.y += 15.0f;
     } else if (key_val == 'f' || key_val == 'F') {
-      rotate = glm::rotate(rotate, glm::radians(-15.0f),
-                           glm::vec3(1.0f, 0.0f, 0.0f));
+      obj->Transform().rotation.x -= 15.0f;
     } else if (key_val == 'g' || key_val == 'G') {
-      rotate =
-          glm::rotate(rotate, glm::radians(15.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+      obj->Transform().rotation.x += 15.0f;
     } else if (key_val == 'z' || key_val == 'Z') {
-      translate = glm::translate(translate, glm::vec3(0.0f, 0.1f, 0.0f));
+      obj->Transform().position.y += 0.1f;
     } else if (key_val == 'c' || key_val == 'C') {
-      translate = glm::translate(translate, glm::vec3(0.0f, -0.1f, 0.0f));
+      obj->Transform().position.y -= 0.1f;
     } else if (key_val == 'v' || key_val == 'V') {
-      kScale -= .10f;
-      scale = glm::scale(glm::mat4{1.f}, glm::vec3(kScale, kScale, kScale));
+      kScale -= 0.1f;
+      obj->Transform().scale = glm::vec3(kScale);
     } else if (key_val == 'b' || key_val == 'B') {
-      kScale += .10f;
-      scale = glm::scale(glm::mat4{1.f}, glm::vec3(kScale, kScale, kScale));
+      kScale += 0.1f;
+      obj->Transform().scale = glm::vec3(kScale);
     } else if (key_val == 'x' || key_val == 'X') {
       perspective ^= 1;
     } else if (key_val == 'p' || key_val == 'P') {
@@ -131,8 +119,10 @@ class OpenGl : public Gtk::GLArea {
       scale = glm::mat4(1.0f);
       perspective = 1;
     }
+    std::cerr << kScale << std::endl;
 
     transform = translate * scale * rotate;
+    queue_draw();
     return false;
   }
 
@@ -145,8 +135,8 @@ class OpenGl : public Gtk::GLArea {
   glm::mat4 view{1.f};
   glm::mat4 projection{1.f};
   glm::mat4 transform{1.f};
-  s21::shaders::ShaderProgram depth;
-  s21::shaders::ShaderProgram shader;
+  s21::shaders::ShaderProgram vertex;
+  s21::shaders::ShaderProgram base;
   s21::Object *obj;
   clock_t start_time;
   clock_t end_time;

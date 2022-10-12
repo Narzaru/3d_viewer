@@ -43,9 +43,6 @@ objects += ../build/object.o
 ../build/object.o: object/object.cc ${header_only_files}
 	${CXX} ${CXXFLAGS} -c $< -o $@ -MD
 
-objects += ../build/material.o
-../build/material.o: object/components/material.cc ${header_only_files}
-	${CXX} ${CXXFLAGS} -c $< -o $@ -MD
 
 objects += ../build/transform.o
 ../build/transform.o: object/components/transform.cc ${header_only_files}
