@@ -8,6 +8,7 @@
 
 #include "core/opengl/mesh/mesh.h"
 
+namespace s21 {
 class MeshLoader {
  public:
   MeshLoader() = default;
@@ -18,5 +19,5 @@ class MeshLoader {
   static Mesh LoadMesh(const aiMesh *mesh);
   std::vector<Mesh> meshes_;
 };
-
+}  // namespace s21
 #endif  // CORE_OPENGL_MESH_MESH_LOADER_H_

@@ -1,5 +1,5 @@
 #include "mesh_loader.h"
-
+namespace s21 {
 std::vector<Mesh> MeshLoader::LoadFromFile(const std::string &file_path) {
   Assimp::Importer importer;
   std::uint32_t mask_of_options = 0;
@@ -111,8 +111,8 @@ Mesh MeshLoader::LoadMesh(const aiMesh *mesh) {
     }
   }
 
-  // !TODO Load and bind textures
-  std::map<std::string, Texture> textures;
+  // !TODO Add support texture loading
 
-  return {std::move(vertices), std::move(indices), textures};
+  return {std::move(vertices), std::move(indices)};
 }
+}  // namespace s21

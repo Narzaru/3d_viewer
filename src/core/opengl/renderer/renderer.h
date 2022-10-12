@@ -12,21 +12,17 @@
 #include "core/opengl/shader/shader_program_builder.h"
 #include "texture.h"
 
+namespace s21::renderer {
 // The renderer class responsible for displaying the model in a world
 class Renderer {
  public:
-  enum class VertexConnectionType { kTriangles, kLines, kNone };
-
   Renderer() = default;
-  explicit Renderer(const std::string &file_path);
-  void LoadMeshesFromFile(const std::string &file_path);
-  void AttachShaderProgram(s21::shaders::ShaderProgram &&shader_program);
-  void Draw(VertexConnectionType type = VertexConnectionType::kTriangles);
+  void AttachMeshes(std::vector<Mesh> &&meshes);
+  void Draw() const;
 
  private:
-  MeshLoader mesh_loader_;
   std::vector<Mesh> meshes_;
-  s21::shaders::ShaderProgram shader_program_;
 };
+}  // namespace s21::renderer
 
 #endif  // SRC_ENGINE_RENDERER_RENDERER_H_

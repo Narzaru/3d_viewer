@@ -4,11 +4,8 @@
 #include "texture.h"
 #include "vertex.h"
 
-Mesh::Mesh(vector<Vertex> vertices, vector<uint> indices,
-           [[maybe_unused]] const map<string, Texture> &textures)
-    : Mesh(std::move(vertices), std::move(indices)) {}
-
-Mesh::Mesh(Mesh::vector<Vertex> vertices, vector<std::uint32_t> indices)
+namespace s21 {
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<std::uint32_t> indices)
     : vertices(std::move(vertices)),
       indices(std::move(indices)),
       VAO(0),
@@ -28,36 +25,24 @@ Mesh::Mesh(Mesh &&other) noexcept
   other.EBO = 0;
 }
 
-void Mesh::DrawTriangles() const {
+void Mesh::Draw() const {
   glBindVertexArray(VAO);
   glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
   glBindVertexArray(0);
 }
 
-void Mesh::DrawLines() const {
-  glBindVertexArray(VAO);
-  glDrawElements(GL_LINES, indices.size(), GL_UNSIGNED_INT, 0);
-  glBindVertexArray(0);
-}
-
-void Mesh::DrawPoints() const {
-  glBindVertexArray(VAO);
-  glDrawElements(GL_POINT, indices.size(), GL_UNSIGNED_INT, 0);
-  glBindVertexArray(0);
-}
-
 void Mesh::SetupMesh() {
   glGenVertexArrays(1, &VAO);
-  glGenBuffers(1, &VBO);
-  glGenBuffers(1, &EBO);
 
   glBindVertexArray(VAO);
 
+  glGenBuffers(1, &VBO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
   glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0],
                GL_STATIC_DRAW);
 
+  glGenBuffers(1, &EBO);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int),
                &indices[0], GL_STATIC_DRAW);
@@ -95,3 +80,5 @@ Mesh::~Mesh() {
   glDeleteBuffers(1, &VBO);
   glDeleteBuffers(1, &EBO);
 }
+
+}  // namespace s21
