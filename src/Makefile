@@ -10,7 +10,7 @@ CXXFLAGS +=\
 	-I./core/opengl/scene\
 	-I./core/opengl/shader
 
-req = gtkmm-3.0 epoxy assimp #Qt5Core Qt5OpenGL Qt5Gui
+req = gtkmm-3.0 epoxy assimp
 CXXFLAGS += $(shell pkg-config --cflags ${req})
 libs := $(shell pkg-config --libs ${req})
 
